@@ -1,0 +1,380 @@
+<div class="form-container">
+  <div class="form-card">
+
+    <div class="form-header">
+      <div class="header-icon-badge">
+        <mat-icon>post_add</mat-icon>
+      </div>
+      <div>
+        <h2>Novo Lançamento</h2>
+        <p>Registre a quantidade, pessoa e valor da dívida</p>
+      </div>
+    </div>
+
+    <!-- Erro -->
+    <div *ngIf="mensagemErro" class="alerta-erro">
+      <mat-icon>warning</mat-icon>
+      <span>{{ mensagemErro }}</span>
+    </div>
+
+    <!-- Seletor do Tipo de Lançamento (Com Cadastro vs Avulso) -->
+    <div class="tipo-toggle-group">
+      <button
+        type="button"
+        class="tipo-btn"
+        matRipple
+        [class.ativo]="tipoLancamento === 'com_produto'"
+        (click)="trocarTipoLancamento('com_produto')">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Do Catálogo</span>
+      </button>
+      <button
+        type="button"
+        class="tipo-btn"
+        matRipple
+        [class.ativo]="tipoLancamento === 'avulso'"
+        (click)="trocarTipoLancamento('avulso')">
+        <mat-icon>edit_note</mat-icon>
+        <span>Lançamento Avulso</span>
+      </button>
+    </div>
+
+    <form (ngSubmit)="salvar()">
+
+      <!-- Seletor de Produto (via Modal Material customizada) -->
+      <div *ngIf="tipoLancamento === 'com_produto'" class="campo-grupo">
+        <label>
+          <mat-icon>cake</mat-icon>
+          <span>Produto do Catálogo *</span>
+        </label>
+
+        <div
+          class="produto-selector-card"
+          matRipple
+          (click)="abrirModalSelecaoProduto()"
+          [class.has-produto]="produtoSelecionadoObjeto">
+          
+          <div *ngIf="!produtoSelecionadoObjeto" class="selector-vazio">
+            <div class="selector-vazio-esq">
+              <mat-icon class="icon-search-prod">search</mat-icon>
+              <div class="vazio-texts">
+                <strong>Toque para selecionar um produto</strong>
+                <span>Escolha entre os {{ produtos.length }} itens do catálogo</span>
+              </div>
+            </div>
+            <mat-icon class="chevron-icon">arrow_drop_down</mat-icon>
+          </div>
+
+          <div *ngIf="produtoSelecionadoObjeto" class="selector-preenchido">
+            <div class="preenchido-avatar">
+              <mat-icon>lunch_dining</mat-icon>
+            </div>
+            <div class="preenchido-info">
+              <span class="preenchido-nome">{{ produtoSelecionadoObjeto.nome }}</span>
+              <div class="preenchido-tags">
+                <span class="vendedor-tag" *ngIf="produtoSelecionadoObjeto.vendedor_pessoa">
+                  <mat-icon>person</mat-icon>
+                  {{ produtoSelecionadoObjeto.vendedor_pessoa }}
+                </span>
+                <span class="preco-tag">
+                  R$ {{ produtoSelecionadoObjeto.preco_padrao.toFixed(2) }} / un.
+                </span>
+              </div>
+            </div>
+            <div class="preenchido-acoes">
+              <button type="button" class="btn-trocar-prod" title="Trocar produto">
+                <mat-icon>swap_horiz</mat-icon>
+              </button>
+              <button
+                type="button"
+                class="btn-limpar-prod"
+                title="Desmarcar produto"
+                (click)="limparProdutoSelecionado($event)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <small *ngIf="produtos.length === 0 && !carregandoProdutos" class="aviso-link">
+          <mat-icon>info</mat-icon>
+          <span>Nenhum produto cadastrado no catálogo ainda.</span>
+        </small>
+      </div>
+
+      <!-- Descrição do Item -->
+      <div class="campo-grupo">
+        <label for="descricao">
+          <mat-icon>label</mat-icon>
+          <span>Descrição / Nome do Item *</span>
+        </label>
+        <input
+          id="descricao"
+          type="text"
+          placeholder="Ex: Cone trufado de brigadeiro ou Almoço"
+          [(ngModel)]="descricao"
+          name="descricao"
+          required
+        />
+      </div>
+
+      <!-- Vendedor ou Pessoa a quem se deve -->
+      <div class="campo-grupo">
+        <label for="vendedor">
+          <mat-icon>person</mat-icon>
+          <span>Pessoa / Vendedor *</span>
+        </label>
+        <input
+          id="vendedor"
+          type="text"
+          placeholder="Ex: Patrícia, Seu Zé, Cantina"
+          [(ngModel)]="vendedorPessoa"
+          (input)="onVendedorInput()"
+          name="vendedorPessoa"
+          required
+        />
+      </div>
+
+      <!-- Chave PIX do Vendedor (Opcional) -->
+      <div class="campo-grupo">
+        <label for="chavePix">
+          <mat-icon>qr_code_2</mat-icon>
+          <span>Chave PIX da Pessoa (Opcional)</span>
+        </label>
+        <div class="input-pix-row">
+          <input
+            id="chavePix"
+            type="text"
+            class="pix-input-flex"
+            placeholder="Ex: (11) 99999-9999, CPF, E-mail..."
+            [(ngModel)]="chavePix"
+            name="chavePix"
+          />
+          <button
+            type="button"
+            class="btn-scan-qr"
+            matRipple
+            title="Ler QR Code PIX pela câmera ou imagem"
+            (click)="abrirScannerQrPix()">
+            <mat-icon>qr_code_scanner</mat-icon>
+            <span>Ler QR</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Linha Dupla: Quantidade (Stepper) e Valor Unitário -->
+      <div class="linha-dupla">
+        <div class="campo-grupo">
+          <label for="quantidade">
+            <mat-icon>shopping_bag</mat-icon>
+            <span>Quantidade *</span>
+          </label>
+          <div class="stepper-box">
+            <button
+              type="button"
+              class="stepper-btn"
+              matRipple
+              [disabled]="quantidade <= 1"
+              (click)="alterarQuantidade(-1)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input
+              id="quantidade"
+              type="number"
+              min="1"
+              step="1"
+              [(ngModel)]="quantidade"
+              name="quantidade"
+              (input)="onQuantidadeInput()"
+              required
+            />
+            <button
+              type="button"
+              class="stepper-btn"
+              matRipple
+              (click)="alterarQuantidade(1)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="valorUnitario">
+            <mat-icon>payments</mat-icon>
+            <span>Valor Unitário (R$) *</span>
+          </label>
+          <input
+            id="valorUnitario"
+            type="number"
+            step="0.01"
+            min="0.01"
+            placeholder="0,00"
+            [(ngModel)]="valorUnitario"
+            name="valorUnitario"
+            (input)="recalcularTotal()"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Resumo do Valor Total Calculado -->
+      <div class="resumo-total-banner">
+        <div class="resumo-esq">
+          <mat-icon>calculate</mat-icon>
+          <div>
+            <span class="resumo-label">Total Calculado</span>
+            <small class="resumo-detalhe">{{ quantidade }} un. &times; R$ {{ (valorUnitario || 0).toFixed(2) }}</small>
+          </div>
+        </div>
+        <div class="resumo-valor">
+          R$ {{ valorTotal.toFixed(2) }}
+        </div>
+      </div>
+
+      <!-- Data de Lançamento -->
+      <div class="campo-grupo">
+        <label for="data">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Data do Lançamento *</span>
+        </label>
+        <input
+          id="data"
+          type="date"
+          [(ngModel)]="dataLancamento"
+          name="dataLancamento"
+          required
+        />
+      </div>
+
+      <!-- Observações -->
+      <div class="campo-grupo">
+        <label for="observacao">
+          <mat-icon>notes</mat-icon>
+          <span>Observação (Opcional)</span>
+        </label>
+        <textarea
+          id="observacao"
+          rows="2"
+          placeholder="Ex: Peguei na parte da tarde..."
+          [(ngModel)]="observacao"
+          name="observacao">
+        </textarea>
+      </div>
+
+      <!-- Anexo de Comprovante de Pagamento (Imagem ou PDF) -->
+      <div class="campo-grupo">
+        <label>
+          <mat-icon>attach_file</mat-icon>
+          <span>Comprovante de Pagamento (Opcional)</span>
+        </label>
+
+        <!-- Input file invisível ativado pelo card ou botão -->
+        <input
+          #fileInput
+          type="file"
+          accept="image/*,application/pdf"
+          style="display: none"
+          (change)="onArquivoSelecionado($event)"
+        />
+
+        <!-- Card de Upload quando vazio -->
+        <div
+          *ngIf="!comprovanteBase64"
+          class="comprovante-upload-dropzone"
+          matRipple
+          (click)="fileInput.click()">
+          <div class="dropzone-icone-circle">
+            <mat-icon>cloud_upload</mat-icon>
+          </div>
+          <div class="dropzone-texts">
+            <strong>Anexar Imagem ou PDF</strong>
+            <span>Tire uma foto, anexe da galeria ou arquivo PDF</span>
+          </div>
+          <button type="button" class="btn-escolher-arquivo" (click)="$event.stopPropagation(); fileInput.click()">
+            <mat-icon>add_photo_alternate</mat-icon>
+            <span>Escolher</span>
+          </button>
+        </div>
+
+        <!-- Preview do Comprovante quando anexado -->
+        <div *ngIf="comprovanteBase64" class="comprovante-anexado-card">
+          <div class="anexado-left">
+            <!-- Miniatura para Imagem -->
+            <div *ngIf="comprovanteTipo === 'imagem'" class="anexado-thumb-box">
+              <img [src]="comprovanteBase64" [alt]="comprovanteNome" class="anexado-thumb" />
+            </div>
+            <!-- Ícone para PDF -->
+            <div *ngIf="comprovanteTipo === 'pdf'" class="anexado-pdf-box">
+              <mat-icon>picture_as_pdf</mat-icon>
+            </div>
+
+            <div class="anexado-info">
+              <span class="anexado-nome">{{ comprovanteNome || 'Comprovante anexado' }}</span>
+              <span class="anexado-tipo-tag" [class.is-pdf]="comprovanteTipo === 'pdf'">
+                <mat-icon>{{ comprovanteTipo === 'pdf' ? 'description' : 'image' }}</mat-icon>
+                {{ comprovanteTipo === 'pdf' ? 'Documento PDF' : 'Imagem / Foto' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="anexado-acoes">
+            <button
+              type="button"
+              class="btn-trocar-anexo"
+              title="Trocar arquivo"
+              (click)="fileInput.click()">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              type="button"
+              class="btn-remover-anexo"
+              title="Remover comprovante"
+              (click)="removerComprovante($event)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Pago / Pendente -->
+      <div class="checkbox-grupo" [class.marcado-pago]="pago" (click)="pago = !pago" matRipple>
+        <div class="status-toggle-left">
+          <mat-icon>{{ pago ? 'check_circle' : 'schedule' }}</mat-icon>
+          <div class="status-toggle-texts">
+            <strong>{{ pago ? 'Lançar como PAGO' : 'Lançar como PENDENTE' }}</strong>
+            <span>{{ pago ? 'Este item já foi quitado' : 'Ficará na lista de valores a pagar' }}</span>
+          </div>
+        </div>
+        <input
+          type="checkbox"
+          [(ngModel)]="pago"
+          name="pago"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="acoes-form">
+        <button
+          type="button"
+          class="btn-cancelar"
+          matRipple
+          (click)="cancelar.emit()"
+          [disabled]="salvando">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Voltar</span>
+        </button>
+
+        <button
+          type="submit"
+          class="btn-salvar"
+          matRipple
+          [disabled]="salvando">
+          <mat-icon>{{ salvando ? 'sync' : 'check' }}</mat-icon>
+          <span>{{ salvando ? 'Gravando...' : 'Salvar Lançamento' }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

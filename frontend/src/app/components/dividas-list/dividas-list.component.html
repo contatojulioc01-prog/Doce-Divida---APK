@@ -1,0 +1,470 @@
+<div class="dividas-container">
+
+  <!-- Feedback Toast / Alerta -->
+  <div *ngIf="mensagemFeedback" class="feedback-toast" [ngClass]="tipoFeedback">
+    <mat-icon>{{ tipoFeedback === 'sucesso' ? 'check_circle' : 'error' }}</mat-icon>
+    <span>{{ mensagemFeedback }}</span>
+  </div>
+
+  <!-- Seletor de Período / Mês -->
+  <section class="periodo-bar-section" *ngIf="mesesDisponiveis.length > 0">
+    <div class="periodo-bar-label">
+      <mat-icon>date_range</mat-icon>
+      <span>Período: <strong>{{ labelPeriodoAtual }}</strong></span>
+    </div>
+    <div class="periodo-chips-scroll">
+      <button
+        type="button"
+        class="periodo-chip"
+        matRipple
+        [class.ativo]="mesSelecionado === 'todos'"
+        (click)="selecionarMes('todos')">
+        <mat-icon>all_inclusive</mat-icon>
+        <span>Todos</span>
+      </button>
+      <button
+        *ngFor="let m of mesesDisponiveis"
+        type="button"
+        class="periodo-chip"
+        matRipple
+        [class.ativo]="mesSelecionado === m.chave"
+        (click)="selecionarMes(m.chave)">
+        <span>{{ m.label }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Cards de Totais Financeiros Acumulados -->
+  <section class="totais-grid">
+    <div class="card-total pendente">
+      <div class="card-total-header">
+        <div class="card-total-icon pendente-icon">
+          <mat-icon>pending_actions</mat-icon>
+        </div>
+        <span class="label">Total a Pagar</span>
+      </div>
+      <div class="valor">R$ {{ totais.total_pendente.toFixed(2) }}</div>
+      <small class="quantidade">
+        {{ totais.qtd_unidades_pendentes || 0 }} un. pendente(s) • {{ totais.qtd_pendente }} pedido(s)
+      </small>
+    </div>
+
+    <div class="card-total pago">
+      <div class="card-total-header">
+        <div class="card-total-icon pago-icon">
+          <mat-icon>verified</mat-icon>
+        </div>
+        <span class="label">Total Quitado</span>
+      </div>
+      <div class="valor">R$ {{ totais.total_pago.toFixed(2) }}</div>
+      <small class="quantidade">
+        {{ totais.qtd_unidades_pagas || 0 }} un. quitada(s) • {{ totais.qtd_pago }} pedido(s)
+      </small>
+    </div>
+  </section>
+
+  <!-- Seção de Quitação Rápida por Pessoa (Lote por Vendedor + Copiar PIX + WhatsApp) -->
+  <section *ngIf="pessoasPendentes.length > 0 && filtroStatus !== 'pagas'" class="pessoas-lote-section">
+    <div class="pessoas-lote-header">
+      <mat-icon>people_alt</mat-icon>
+      <span>Saldo a Pagar por Pessoa (Quitação &amp; Cobrança):</span>
+    </div>
+    <div class="pessoas-lote-scroll">
+      <div *ngFor="let p of pessoasPendentes" class="pessoa-lote-card">
+        <div class="pessoa-lote-top">
+          <div class="pessoa-lote-nome">
+            <mat-icon>person</mat-icon>
+            <strong>{{ p.vendedor_pessoa }}</strong>
+          </div>
+          <span class="pessoa-lote-qtd">{{ p.qtd_pedidos }} ped.</span>
+        </div>
+        <div class="pessoa-lote-valor">R$ {{ p.total_pendente.toFixed(2) }}</div>
+        <div class="pessoa-lote-acoes">
+          <button
+            type="button"
+            class="btn-whats-mini"
+            matRipple
+            title="Gerar resumo para WhatsApp de {{ p.vendedor_pessoa }}"
+            (click)="abrirResumoWhatsAppPessoa(p.vendedor_pessoa, $event)">
+            <mat-icon>chat</mat-icon>
+            <span>WhatsApp</span>
+          </button>
+          <button
+            *ngIf="p.chave_pix"
+            type="button"
+            class="btn-pix-mini"
+            matRipple
+            title="Copiar chave PIX de {{ p.vendedor_pessoa }}"
+            (click)="copiarPix(p.chave_pix, p.vendedor_pessoa, $event)">
+            <mat-icon>qr_code_2</mat-icon>
+            <span>PIX</span>
+          </button>
+          <button
+            type="button"
+            class="btn-quitar-pessoa"
+            matRipple
+            (click)="abrirModalQuitarPessoa(p, $event)">
+            <mat-icon>done_all</mat-icon>
+            <span>Quitar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Filtros e Busca -->
+  <section class="filtros-section">
+    <div class="busca-box">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Buscar por produto ou pessoa..."
+        [(ngModel)]="buscaVendedor"
+        (input)="onBuscaChange()"
+      />
+      <button *ngIf="buscaVendedor" type="button" class="clear-btn" (click)="limparBusca()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="linha-controles-filtros">
+      <div class="chips-status">
+        <button
+          type="button"
+          class="chip-btn"
+          matRipple
+          [class.ativo]="filtroStatus === 'todas'"
+          (click)="aplicarFiltroStatus('todas')">
+          <mat-icon>list_alt</mat-icon>
+          <span>Todos ({{ totais.qtd_total }})</span>
+        </button>
+        <button
+          type="button"
+          class="chip-btn chip-pendente"
+          matRipple
+          [class.ativo]="filtroStatus === 'pendentes'"
+          (click)="aplicarFiltroStatus('pendentes')">
+          <mat-icon>schedule</mat-icon>
+          <span>Pendentes ({{ totais.qtd_pendente }})</span>
+        </button>
+        <button
+          type="button"
+          class="chip-btn chip-pago"
+          matRipple
+          [class.ativo]="filtroStatus === 'pagas'"
+          (click)="aplicarFiltroStatus('pagas')">
+          <mat-icon>task_alt</mat-icon>
+          <span>Pagos ({{ totais.qtd_pago }})</span>
+        </button>
+      </div>
+
+      <div class="botoes-expansao" *ngIf="grupos.length > 0">
+        <button type="button" class="btn-toggle-all" matRipple (click)="expandirTodos()" title="Expandir todos os detalhes">
+          <mat-icon>unfold_more</mat-icon>
+        </button>
+        <button type="button" class="btn-toggle-all" matRipple (click)="recolherTodos()" title="Recolher todos">
+          <mat-icon>unfold_less</mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lista de Grupos Aglomerados por Produto -->
+  <section class="lista-section">
+    <div *ngIf="carregando" class="carregando-box">
+      <div class="spinner"></div>
+      <p>Consultando banco SQLite local...</p>
+    </div>
+
+    <div *ngIf="!carregando && grupos.length === 0" class="lista-vazia">
+      <div class="vazia-icone-circle">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <h3>Nenhum lançamento encontrado</h3>
+      <p>Utilize o botão abaixo para registrar pedidos com quantidade e pessoa vinculada.</p>
+      <button type="button" class="btn-novo-inline" matRipple (click)="abrirNovo.emit()">
+        <mat-icon>add_circle</mat-icon>
+        <span>Lançar Nova Dívida</span>
+      </button>
+    </div>
+
+    <div *ngIf="!carregando && grupos.length > 0" class="grupos-lista">
+      <div
+        *ngFor="let grupo of grupos"
+        class="grupo-card"
+        [class.grupo-pago]="grupo.todos_pagos"
+        [class.grupo-pendente]="!grupo.todos_pagos"
+        [class.grupo-expandido]="grupo.expandido">
+
+        <!-- CABEÇALHO DO GRUPO (Aglomerado) - Clicável para expandir -->
+        <div class="grupo-header" matRipple (click)="toggleGrupo(grupo)">
+          <div class="grupo-header-top">
+            <div class="grupo-identificacao">
+              <span class="pessoa-pill">
+                <mat-icon>person</mat-icon>
+                {{ grupo.vendedor_pessoa }}
+              </span>
+              <span *ngIf="grupo.total_pedidos > 1" class="badge-pedidos-count">
+                <mat-icon>layers</mat-icon>
+                {{ grupo.total_pedidos }} pedidos
+              </span>
+              <button
+                *ngIf="grupo.chave_pix"
+                type="button"
+                class="pill-copiar-pix-grupo"
+                matRipple
+                title="Copiar PIX: {{ grupo.chave_pix }}"
+                (click)="copiarPix(grupo.chave_pix, grupo.vendedor_pessoa, $event)">
+                <mat-icon>qr_code_2</mat-icon>
+                <span>PIX</span>
+              </button>
+              <button
+                type="button"
+                class="pill-whats-grupo"
+                matRipple
+                title="Resumo deste grupo para WhatsApp"
+                (click)="abrirResumoWhatsAppGrupo(grupo, $event)">
+                <mat-icon>chat</mat-icon>
+                <span>Resumo</span>
+              </button>
+            </div>
+
+            <!-- Status do Grupo -->
+            <span class="status-pill" [class.pago]="grupo.todos_pagos" [class.parcial]="grupo.parcialmente_pago">
+              <mat-icon>{{ grupo.todos_pagos ? 'check_circle' : (grupo.parcialmente_pago ? 'pie_chart' : 'schedule') }}</mat-icon>
+              {{ grupo.todos_pagos ? 'Quitado' : (grupo.parcialmente_pago ? 'Parcial' : 'Pendente') }}
+            </span>
+          </div>
+
+          <!-- Título do Produto / Agrupamento -->
+          <div class="grupo-titulo-row">
+            <h3 class="grupo-titulo">{{ grupo.descricao }}</h3>
+            <div class="grupo-acoes-rapidas">
+              <button
+                type="button"
+                class="btn-mais-um-hoje"
+                matRipple
+                title="Lançar +1 unidade deste produto com a data de hoje"
+                (click)="repetirPedidoRapido(grupo, $event)">
+                <mat-icon>exposure_plus_1</mat-icon>
+                <span>+1 Hoje</span>
+              </button>
+              <button
+                *ngIf="!grupo.todos_pagos"
+                type="button"
+                class="btn-quitar-grupo"
+                matRipple
+                title="Quitar todos os pedidos deste grupo de uma vez"
+                (click)="abrirModalQuitarGrupo(grupo, $event)">
+                <mat-icon>done_all</mat-icon>
+                <span>Quitar Grupo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumo Aglomerado de Quantidades e Valores -->
+          <div class="grupo-resumo-grid">
+            <div class="resumo-bloco">
+              <span class="resumo-rotulo">Quantidade Acumulada</span>
+              <strong class="resumo-dado">
+                {{ grupo.total_quantidade }} un.
+                <small *ngIf="!grupo.todos_pagos" class="detalhe-qtd">
+                  ({{ grupo.total_quantidade_pendente }} a pagar<span *ngIf="grupo.total_quantidade_paga > 0">, {{ grupo.total_quantidade_paga }} quitadas</span>)
+                </small>
+              </strong>
+            </div>
+
+            <div class="resumo-bloco bloco-valor">
+              <span class="resumo-rotulo">{{ grupo.todos_pagos ? 'Total Quitado' : 'Total a Pagar' }}</span>
+              <strong class="resumo-valor-destaque" [class.texto-verde]="grupo.todos_pagos" [class.texto-vermelho]="!grupo.todos_pagos">
+                R$ {{ (grupo.todos_pagos ? grupo.total_valor_pago : grupo.total_valor_pendente).toFixed(2) }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- Barra de Toque e Indicador de Expansão -->
+          <div class="grupo-footer-touch">
+            <span class="toque-texto">
+              <mat-icon>{{ grupo.expandido ? 'keyboard_arrow_up' : 'touch_app' }}</mat-icon>
+              {{ grupo.expandido ? 'Ocultar detalhes dos pedidos' : ('Ver detalhes (' + grupo.total_pedidos + ' pedido' + (grupo.total_pedidos > 1 ? 's' : '') + ' • dia, qtd, valor)') }}
+            </span>
+            <div class="chevron-circle" [class.aberto]="grupo.expandido">
+              <mat-icon>{{ grupo.expandido ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA EXPANDIDA COM OS PEDIDOS DETALHADOS -->
+        <div *ngIf="grupo.expandido" class="pedidos-detalhados-container">
+          <div class="pedidos-detalhados-header">
+            <mat-icon>format_list_bulleted</mat-icon>
+            <span>Lançamentos individuais de <strong>{{ grupo.descricao }}</strong>:</span>
+          </div>
+
+          <div class="pedidos-items-list">
+            <div
+              *ngFor="let item of grupo.itens; let idx = index"
+              class="pedido-item-card"
+              [class.pedido-pago]="item.pago"
+              [class.pedido-pendente]="!item.pago">
+
+              <!-- Linha Superior do Pedido Individual: Data e Status -->
+              <div class="pedido-item-topo">
+                <div class="pedido-data-box">
+                  <mat-icon>calendar_today</mat-icon>
+                  <span class="data-texto">Dia {{ item.data_lancamento }}</span>
+                </div>
+
+                <span class="pedido-status-badge" [class.pago]="item.pago" [class.parcial]="!item.pago && ((item.valor_pago || 0) > 0 || (item.quantidade_paga || 0) > 0)">
+                  {{ item.pago ? 'Quitado' : ((item.valor_pago || 0) > 0 ? ('Pago R$ ' + (item.valor_pago || 0).toFixed(2) + ' de R$ ' + item.valor.toFixed(2)) : ((item.quantidade_paga || 0) > 0 ? ((item.quantidade_paga || 0) + ' de ' + item.quantidade + ' un. pagos') : 'Pendente')) }}
+                </span>
+              </div>
+
+              <!-- Corpo do Pedido Individual: Quantidade e Valores -->
+              <div class="pedido-item-corpo">
+                <div class="metricas-pedido">
+                  <div class="metrica-col">
+                    <span class="metrica-lbl">Quantidade</span>
+                    <strong class="metrica-val">{{ item.quantidade }} un.</strong>
+                    <small *ngIf="(item.quantidade_paga || 0) > 0 && !item.pago" class="sub-metrica-aviso">
+                      {{ (item.quantidade - (item.quantidade_paga || 0)) }} restante(s)
+                    </small>
+                  </div>
+
+                  <div class="metrica-col">
+                    <span class="metrica-lbl">Valor Unitário</span>
+                    <span class="metrica-val">R$ {{ (item.valor_unitario || (item.valor / item.quantidade)).toFixed(2) }}</span>
+                    <small *ngIf="!item.pago && (item.valor_pago || 0) > 0" class="sub-metrica-pago">
+                      Pago: R$ {{ (item.valor_pago || 0).toFixed(2) }}
+                    </small>
+                  </div>
+
+                  <div class="metrica-col metrica-destaque">
+                    <span class="metrica-lbl">Total / Restante</span>
+                    <strong class="metrica-val">R$ {{ item.valor.toFixed(2) }}</strong>
+                    <small *ngIf="!item.pago" class="sub-metrica-falta">
+                      Falta: R$ {{ Math.max(0, item.valor - (item.valor_pago || 0)).toFixed(2) }}
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Observação do Pedido -->
+                <p *ngIf="item.observacao" class="pedido-obs">
+                  <mat-icon>sticky_note_2</mat-icon>
+                  <span>{{ item.observacao }}</span>
+                </p>
+
+                <!-- Comprovante Principal Anexado ao Pedido -->
+                <div *ngIf="item.comprovante_base64" class="pedido-comprovante-box">
+                  <div class="comprovante-left" (click)="visualizarComprovante(item, $event)" matRipple>
+                    <div class="comprovante-icone" [class.is-pdf]="item.comprovante_tipo === 'pdf'">
+                      <mat-icon>{{ item.comprovante_tipo === 'pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+                    </div>
+                    <div class="comprovante-info">
+                      <span class="comprovante-titulo">{{ item.comprovante_nome || 'Comprovante' }}</span>
+                      <span class="comprovante-sub">Toque para visualizar / baixar</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-ver-comprovante"
+                    matRipple
+                    title="Ver comprovante"
+                    (click)="visualizarComprovante(item, $event)">
+                    <mat-icon>visibility</mat-icon>
+                    <span>Ver</span>
+                  </button>
+                </div>
+
+                <!-- Sub-extrato / Histórico de Amortizações do Pedido -->
+                <div *ngIf="item.historico_pagamentos && item.historico_pagamentos.length > 0" class="historico-amortizacoes-box">
+                  <div class="historico-header">
+                    <mat-icon>history</mat-icon>
+                    <span>Histórico de Pagamentos ({{ item.historico_pagamentos.length }})</span>
+                  </div>
+                  <div class="historico-lista">
+                    <div *ngFor="let hist of item.historico_pagamentos" class="historico-linha">
+                      <div class="hist-esq">
+                        <span class="hist-data">
+                          <mat-icon>check_circle</mat-icon>
+                          Dia {{ hist.data_pagamento }}
+                        </span>
+                        <small *ngIf="hist.observacao" class="hist-obs">{{ hist.observacao }}</small>
+                      </div>
+                      <div class="hist-dir">
+                        <strong class="hist-valor">+ R$ {{ hist.valor_pago.toFixed(2) }}</strong>
+                        <button
+                          *ngIf="hist.comprovante_base64"
+                          type="button"
+                          class="btn-hist-anexo"
+                          title="Ver comprovante deste pagamento"
+                          (click)="visualizarComprovanteHistorico(hist, item.descricao, $event)">
+                          <mat-icon>attachment</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações do Pedido Individual -->
+              <div class="pedido-item-acoes">
+                <!-- Botão Pagar (Valor ou Quantidade + Anexo) -->
+                <button
+                  *ngIf="!item.pago"
+                  type="button"
+                  class="btn-pagar-qtd"
+                  matRipple
+                  title="Pagar valor ou quantidade deste pedido"
+                  (click)="abrirModalPagamentoParcial(item, $event)">
+                  <mat-icon>paid</mat-icon>
+                  <span>Pagar</span>
+                </button>
+
+                <!-- Botão Quitar Tudo ou Reabrir -->
+                <button
+                  type="button"
+                  class="btn-quitar-item"
+                  matRipple
+                  [class.btn-marcar-pago]="!item.pago"
+                  [class.btn-reabrir]="item.pago"
+                  (click)="alternarStatus(item, $event)">
+                  <mat-icon>{{ item.pago ? 'replay' : 'check_circle' }}</mat-icon>
+                  <span>{{ item.pago ? 'Reabrir Pedido' : 'Quitar Pedido' }}</span>
+                </button>
+
+                <!-- Botão Editar -->
+                <button
+                  type="button"
+                  class="btn-editar-item"
+                  matRipple
+                  title="Editar este pedido"
+                  (click)="abrirModalEditarDivida(item, $event)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <!-- Botão Excluir -->
+                <button
+                  type="button"
+                  class="btn-excluir-item"
+                  matRipple
+                  title="Excluir este pedido"
+                  (click)="excluir(item, $event)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Botão Flutuante (FAB) Mobile -->
+  <button type="button" class="fab-btn" matRipple title="Nova Dívida" (click)="abrirNovo.emit()">
+    <mat-icon>add</mat-icon>
+  </button>
+
+</div>

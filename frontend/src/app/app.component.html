@@ -1,0 +1,112 @@
+<div class="mobile-app-shell" [class.dark-theme]="modoEscuro">
+
+  <!-- Cabeçalho Superior Mobile (App Bar) -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo-box">
+        <div class="logo-icon-badge flying-money-badge">
+          <span class="emoji-flying-money">💸</span>
+        </div>
+        <div class="title-wrapper">
+          <h1 class="app-title">Doce Dívida</h1>
+          <span class="app-subtitle">Controle Pessoal &amp; Catálogo</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-theme-toggle"
+          matRipple
+          [title]="modoEscuro ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'"
+          (click)="alternarModoEscuro()">
+          <mat-icon>{{ modoEscuro ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+
+        <button
+          type="button"
+          class="badge-status btn-backup-header"
+          matRipple
+          title="Backup e Restauração do Banco SQLite"
+          (click)="abrirModalBackup()">
+          <mat-icon>cloud_sync</mat-icon>
+          <span>Backup</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Área Principal de Visualização -->
+  <main class="app-content">
+    <app-dividas-list
+      *ngIf="abaAtiva === 'extrato'"
+      (abrirNovo)="selecionarAba('novo')">
+    </app-dividas-list>
+
+    <app-divida-form
+      *ngIf="abaAtiva === 'novo'"
+      (salvo)="onDividaSalva()"
+      (cancelar)="selecionarAba('extrato')">
+    </app-divida-form>
+
+    <app-produtos-list
+      *ngIf="abaAtiva === 'produtos'">
+    </app-produtos-list>
+
+    <app-relatorios-dashboard
+      *ngIf="abaAtiva === 'relatorios'">
+    </app-relatorios-dashboard>
+  </main>
+
+  <!-- Barra de Navegação Inferior Fixa (Material Design Mobile / APK) -->
+  <nav class="bottom-nav">
+    <button
+      type="button"
+      class="nav-item"
+      matRipple
+      [class.ativo]="abaAtiva === 'extrato'"
+      (click)="selecionarAba('extrato')">
+      <div class="nav-pill">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <span class="nav-label">Extrato</span>
+    </button>
+
+    <button
+      type="button"
+      class="nav-item nav-item-destaque"
+      matRipple
+      [class.ativo]="abaAtiva === 'novo'"
+      (click)="selecionarAba('novo')">
+      <div class="nav-pill-central">
+        <mat-icon>add</mat-icon>
+      </div>
+      <span class="nav-label">Lançar</span>
+    </button>
+
+    <button
+      type="button"
+      class="nav-item"
+      matRipple
+      [class.ativo]="abaAtiva === 'produtos'"
+      (click)="selecionarAba('produtos')">
+      <div class="nav-pill">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <span class="nav-label">Catálogo</span>
+    </button>
+
+    <button
+      type="button"
+      class="nav-item"
+      matRipple
+      [class.ativo]="abaAtiva === 'relatorios'"
+      (click)="selecionarAba('relatorios')">
+      <div class="nav-pill">
+        <mat-icon>bar_chart</mat-icon>
+      </div>
+      <span class="nav-label">Relatórios</span>
+    </button>
+  </nav>
+
+</div>

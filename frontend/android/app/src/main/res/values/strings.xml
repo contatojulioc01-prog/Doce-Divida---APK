@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Doce Divida</string>
+    <string name="title_activity_main">Doce Divida</string>
+    <string name="package_name">com.docedivida.app</string>
+    <string name="custom_url_scheme">com.docedivida.app</string>
+</resources>

@@ -1,0 +1,17 @@
+{
+  "name": "doce-divida-backend",
+  "version": "1.0.0",
+  "description": "API REST Node.js para controle pessoal de dividas e produtos com MySQL",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

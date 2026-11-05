@@ -1,0 +1,10 @@
+{
+  "appId": "com.docedivida.app",
+  "appName": "Doce Divida",
+  "webDir": "dist/doce-divida-frontend/browser",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  }
+}
+

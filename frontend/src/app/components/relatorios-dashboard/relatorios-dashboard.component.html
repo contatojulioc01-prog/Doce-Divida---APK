@@ -1,0 +1,233 @@
+<div class="relatorios-container">
+
+  <!-- Cabeçalho da Página de Relatórios -->
+  <div class="relatorios-header-card">
+    <div class="header-badge">
+      <mat-icon>insights</mat-icon>
+    </div>
+    <div class="header-texts">
+      <h2>Dashboard &amp; Relatórios</h2>
+      <p>Análise de gastos por pessoa, produtos favoritos e histórico mensal</p>
+    </div>
+  </div>
+
+  <!-- Seletor de Período / Mês -->
+  <section class="periodo-bar" *ngIf="mesesFiltro.length > 0">
+    <div class="periodo-chips">
+      <button
+        type="button"
+        class="chip-periodo"
+        matRipple
+        [class.ativo]="mesSelecionado === 'todos'"
+        (click)="selecionarMes('todos')">
+        <mat-icon>all_inclusive</mat-icon>
+        <span>Todos os Meses</span>
+      </button>
+      <button
+        *ngFor="let m of mesesFiltro"
+        type="button"
+        class="chip-periodo"
+        matRipple
+        [class.ativo]="mesSelecionado === m.chave"
+        (click)="selecionarMes(m.chave)">
+        <span>{{ m.label }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Indicadores Gerais (KPIs + Barra de Quitação) -->
+  <section class="kpi-master-card">
+    <div class="kpi-top-row">
+      <div class="kpi-main">
+        <span class="kpi-lbl">Total Movimentado ({{ labelPeriodoAtual }})</span>
+        <strong class="kpi-val-gigante">R$ {{ totalGeral.toFixed(2) }}</strong>
+      </div>
+      <div class="kpi-taxa-badge" [class.quitado]="taxaQuitacao === 100">
+        <span>{{ taxaQuitacao }}% quitado</span>
+      </div>
+    </div>
+
+    <!-- Barra de Progresso Pago vs Pendente -->
+    <div class="barra-progresso-geral">
+      <div class="barra-verde" [style.width.%]="taxaQuitacao"></div>
+    </div>
+
+    <div class="kpi-sub-grid">
+      <div class="kpi-mini-box pago">
+        <span class="mini-lbl">Já Pago</span>
+        <strong>R$ {{ totalPago.toFixed(2) }}</strong>
+      </div>
+      <div class="kpi-mini-box pendente">
+        <span class="mini-lbl">Falta Pagar</span>
+        <strong>R$ {{ totalPendente.toFixed(2) }}</strong>
+      </div>
+      <div class="kpi-mini-box neutro">
+        <span class="mini-lbl">Volume</span>
+        <strong>{{ totalUnidades }} un. ({{ totalPedidos }} ped.)</strong>
+      </div>
+      <div class="kpi-mini-box neutro">
+        <span class="mini-lbl">Ticket Médio</span>
+        <strong>R$ {{ ticketMedio.toFixed(2) }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRÁFICO 1: Com Quem Você Mais Gasta -->
+  <section class="grafico-card">
+    <div class="grafico-header">
+      <div class="grafico-title">
+        <mat-icon>people</mat-icon>
+        <h3>Com Quem Você Mais Gasta</h3>
+      </div>
+      <span class="grafico-sub">{{ rankingPessoas.length }} pessoa(s)</span>
+    </div>
+
+    <div *ngIf="rankingPessoas.length === 0" class="vazio-mini">
+      Nenhum lançamento registrado neste período.
+    </div>
+
+    <div *ngIf="rankingPessoas.length > 0" class="ranking-lista">
+      <div *ngFor="let p of rankingPessoas; let i = index" class="ranking-item">
+        <div class="rank-topo">
+          <div class="rank-esq">
+            <span class="rank-pos" [class.top1]="i === 0" [class.top2]="i === 1" [class.top3]="i === 2">
+              {{ i + 1 }}º
+            </span>
+            <div class="rank-ident">
+              <strong>{{ p.vendedor_pessoa }}</strong>
+              <small>{{ p.qtd_pedidos }} pedido(s) • {{ p.qtd_unidades }} un.</small>
+            </div>
+          </div>
+
+          <div class="rank-dir">
+            <strong class="rank-total">R$ {{ p.total_geral.toFixed(2) }}</strong>
+            <button
+              type="button"
+              class="btn-whats-rank"
+              matRipple
+              title="Enviar resumo no WhatsApp para {{ p.vendedor_pessoa }}"
+              (click)="abrirResumoWhatsApp(p)">
+              <mat-icon>chat</mat-icon>
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra Proporcional com Divisão Pago / Pendente -->
+        <div class="rank-bar-track">
+          <div class="rank-bar-fill" [style.width.%]="p.percentual_barra">
+            <div class="rank-bar-pago" [style.width.%]="p.percentual_pago"></div>
+          </div>
+        </div>
+
+        <div class="rank-legenda">
+          <span class="leg-pago">Pago: R$ {{ p.total_pago.toFixed(2) }}</span>
+          <span *ngIf="p.total_pendente > 0" class="leg-pendente">Falta: R$ {{ p.total_pendente.toFixed(2) }}</span>
+          <span *ngIf="p.total_pendente <= 0" class="leg-quitado">Tudo Quitado ✓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRÁFICO 2: Top Produtos Mais Comprados -->
+  <section class="grafico-card">
+    <div class="grafico-header">
+      <div class="grafico-title">
+        <mat-icon>emoji_events</mat-icon>
+        <h3>Top Produtos Mais Comprados</h3>
+      </div>
+      <span class="grafico-sub">Por quantidade</span>
+    </div>
+
+    <div *ngIf="rankingProdutos.length === 0" class="vazio-mini">
+      Nenhum produto registrado neste período.
+    </div>
+
+    <div *ngIf="rankingProdutos.length > 0" class="ranking-lista">
+      <div *ngFor="let prod of rankingProdutos; let i = index" class="ranking-item">
+        <div class="rank-topo">
+          <div class="rank-esq">
+            <span class="rank-pos" [class.top1]="i === 0" [class.top2]="i === 1" [class.top3]="i === 2">
+              {{ i + 1 }}º
+            </span>
+            <div class="rank-ident">
+              <strong>{{ prod.descricao }}</strong>
+              <small>{{ prod.vendedor_pessoa }} • {{ prod.qtd_pedidos }} pedido(s)</small>
+            </div>
+          </div>
+
+          <div class="rank-dir-prod">
+            <span class="badge-unidades">{{ prod.qtd_unidades }} un.</span>
+            <strong class="rank-total">R$ {{ prod.total_geral.toFixed(2) }}</strong>
+          </div>
+        </div>
+
+        <div class="rank-bar-track">
+          <div class="rank-bar-prod" [style.width.%]="prod.percentual_barra"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRÁFICO 3: Histórico Mensal Comparativo -->
+  <section class="grafico-card" *ngIf="evolucaoMensal.length > 0">
+    <div class="grafico-header">
+      <div class="grafico-title">
+        <mat-icon>bar_chart</mat-icon>
+        <h3>Total Gasto por Mês</h3>
+      </div>
+      <span class="grafico-sub">Histórico geral</span>
+    </div>
+
+    <div class="ranking-lista">
+      <div
+        *ngFor="let m of evolucaoMensal"
+        class="ranking-item item-mes-clicavel"
+        matRipple
+        (click)="selecionarMes(m.chave)">
+        <div class="rank-topo">
+          <div class="rank-ident">
+            <strong>{{ m.label }}</strong>
+            <small>{{ m.qtd_pedidos }} pedido(s) • {{ m.qtd_unidades }} un.</small>
+          </div>
+          <strong class="rank-total">R$ {{ m.total_geral.toFixed(2) }}</strong>
+        </div>
+
+        <div class="rank-bar-track">
+          <div class="rank-bar-fill" [style.width.%]="m.percentual_barra">
+            <div
+              class="rank-bar-pago"
+              [style.width.%]="m.total_geral > 0 ? (m.total_pago / m.total_geral) * 100 : 0">
+            </div>
+          </div>
+        </div>
+
+        <div class="rank-legenda">
+          <span class="leg-pago">Pago: R$ {{ m.total_pago.toFixed(2) }}</span>
+          <span *ngIf="m.total_pendente > 0" class="leg-pendente">Pendente: R$ {{ m.total_pendente.toFixed(2) }}</span>
+          <span *ngIf="m.total_pendente <= 0" class="leg-quitado">Mês Quitado ✓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Card de Segurança dos Dados (Backup & Restauração SQLite) -->
+  <section class="grafico-card card-seguranca-backup">
+    <div class="grafico-header">
+      <div class="grafico-title">
+        <mat-icon>cloud_sync</mat-icon>
+        <h3>Segurança dos Dados (SQLite Local)</h3>
+      </div>
+      <span class="grafico-sub">Backup &amp; Restauração</span>
+    </div>
+    <p class="backup-desc">
+      Exporte uma cópia completa dos seus produtos, pedidos e comprovantes para guardar no Google Drive/WhatsApp ou restaure em um novo aparelho.
+    </p>
+    <button type="button" class="btn-abrir-backup-card" matRipple (click)="abrirModalBackup()">
+      <mat-icon>settings_backup_restore</mat-icon>
+      <span>Exportar ou Restaurar Backup</span>
+    </button>
+  </section>
+
+</div>
+

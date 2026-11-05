@@ -1,0 +1,646 @@
+/* Estilos Globais Mobile Friendly & Responsivo para Qualquer Dispositivo */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --primary-light: #6366f1;
+  --bg-app: #f8fafc;
+  --surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+}
+
+/* ========================================================================== */
+/* TEMA ESCURO (DARK MODE) GLOBAL REFINADO                                    */
+/* ========================================================================== */
+body.dark-theme {
+  --primary: #818cf8;
+  --primary-dark: #6366f1;
+  --primary-light: #a5b4fc;
+  --bg-app: #0b0f19;
+  --surface: #151e32;
+  --surface-elevated: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #2a364f;
+  --danger: #f87171;
+  --danger-bg: rgba(239, 68, 68, 0.16);
+  --success: #34d399;
+  --success-bg: rgba(16, 185, 129, 0.16);
+  color-scheme: dark;
+}
+
+/* Header & Bottom Nav */
+body.dark-theme .app-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%) !important;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.dark-theme .bottom-nav {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-top: 1px solid #26334d !important;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.dark-theme .nav-item {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .nav-item.ativo {
+  color: #a5b4fc !important;
+}
+
+body.dark-theme .nav-item.ativo .nav-pill {
+  background: rgba(99, 102, 241, 0.24) !important;
+  color: #c7d2fe !important;
+}
+
+/* Cards de Superfície Principal */
+body.dark-theme .grupo-card,
+body.dark-theme .periodo-bar-section,
+body.dark-theme .pessoas-lote-section,
+body.dark-theme .busca-box,
+body.dark-theme .form-card,
+body.dark-theme .card-formulario,
+body.dark-theme .card-lista,
+body.dark-theme .card-catalogo,
+body.dark-theme .relatorios-header-card,
+body.dark-theme .periodo-bar,
+body.dark-theme .grafico-card,
+body.dark-theme .lista-vazia,
+body.dark-theme .carregando-box {
+  background: #151e32 !important;
+  border-color: #26334d !important;
+  color: #f8fafc !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32) !important;
+}
+
+body.dark-theme .grupo-card.grupo-pago {
+  background: #121a2b !important;
+  border-left-color: #10b981 !important;
+}
+
+/* Cards de Total (A Pagar / Pago) */
+body.dark-theme .card-total.pendente {
+  background: linear-gradient(135deg, #151e32 45%, rgba(239, 68, 68, 0.16) 100%) !important;
+  border-color: rgba(239, 68, 68, 0.28) !important;
+  border-left: 4px solid #ef4444 !important;
+}
+
+body.dark-theme .card-total.pago {
+  background: linear-gradient(135deg, #151e32 45%, rgba(16, 185, 129, 0.16) 100%) !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+  border-left: 4px solid #10b981 !important;
+}
+
+body.dark-theme .pendente-icon {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+}
+
+body.dark-theme .pago-icon {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #6ee7b7 !important;
+}
+
+/* Bordas e Divisores Internos de Cards */
+body.dark-theme .card-header,
+body.dark-theme .form-header,
+body.dark-theme .grafico-header {
+  border-bottom-color: #26334d !important;
+}
+
+body.dark-theme .grupo-header:hover {
+  background-color: #1a253d !important;
+}
+
+/* Caixas Internas / Sub-cards / Elementos Secundários */
+body.dark-theme .grupo-resumo-grid,
+body.dark-theme .metricas-pedido,
+body.dark-theme .historico-amortizacoes-box,
+body.dark-theme .pessoa-lote-card,
+body.dark-theme .ranking-item,
+body.dark-theme .item-card,
+body.dark-theme .produto-item-card,
+body.dark-theme .busca-catalogo,
+body.dark-theme .busca-input-box,
+body.dark-theme .pedido-obs,
+body.dark-theme .pedido-status-box,
+body.dark-theme .resumo-banco-card {
+  background: #0f172a !important;
+  border-color: #26334d !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .pedidos-detalhados-container {
+  background: #0c1322 !important;
+  border-top-color: #26334d !important;
+}
+
+body.dark-theme .pedido-item-card {
+  background: #172238 !important;
+  border-color: #2a3956 !important;
+  border-left: 4px solid #ef4444 !important;
+}
+
+body.dark-theme .pedido-item-card.pedido-pago {
+  background: #131d30 !important;
+  border-left-color: #10b981 !important;
+}
+
+body.dark-theme .historico-linha {
+  border-top-color: #26334d !important;
+}
+
+body.dark-theme .contador-item {
+  background: #151e32 !important;
+  border-color: #26334d !important;
+}
+
+/* Tipografia e Contraste em Dark Mode */
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme strong,
+body.dark-theme .grupo-titulo,
+body.dark-theme .item-nome,
+body.dark-theme .preenchido-nome,
+body.dark-theme .anexado-nome,
+body.dark-theme .pedido-data-box,
+body.dark-theme .hist-data,
+body.dark-theme .metrica-val,
+body.dark-theme .metrica-destaque .metrica-val,
+body.dark-theme .rank-total,
+body.dark-theme .periodo-bar-label strong {
+  color: #f8fafc !important;
+}
+
+body.dark-theme label,
+body.dark-theme .campo-grupo label,
+body.dark-theme .campo-box label,
+body.dark-theme .periodo-bar-label,
+body.dark-theme .pessoas-lote-header,
+body.dark-theme .pedidos-detalhados-header,
+body.dark-theme .historico-header,
+body.dark-theme .backup-desc {
+  color: #cbd5e1 !important;
+}
+
+/* Textos de Valores (Verde / Vermelho vibrantes no escuro) */
+body.dark-theme .texto-verde,
+body.dark-theme .item-preco,
+body.dark-theme .hist-valor,
+body.dark-theme .sub-metrica-pago,
+body.dark-theme .leg-pago,
+body.dark-theme .leg-quitado {
+  color: #34d399 !important;
+}
+
+body.dark-theme .texto-vermelho,
+body.dark-theme .pessoa-lote-valor,
+body.dark-theme .sub-metrica-aviso,
+body.dark-theme .sub-metrica-falta,
+body.dark-theme .leg-pendente {
+  color: #f87171 !important;
+}
+
+/* Pills, Tags e Badges */
+body.dark-theme .pessoa-pill,
+body.dark-theme .badge-pedidos-count,
+body.dark-theme .pessoa-lote-qtd,
+body.dark-theme .vendedor-tag,
+body.dark-theme .badge-unidades {
+  background: rgba(99, 102, 241, 0.2) !important;
+  border-color: rgba(129, 140, 248, 0.35) !important;
+  color: #c7d2fe !important;
+}
+
+body.dark-theme .preco-tag,
+body.dark-theme .anexado-tipo-tag:not(.is-pdf) {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #6ee7b7 !important;
+}
+
+body.dark-theme .status-pill,
+body.dark-theme .pedido-status-badge {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+}
+
+body.dark-theme .status-pill.pago,
+body.dark-theme .pedido-status-badge.pago {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #6ee7b7 !important;
+}
+
+body.dark-theme .status-pill.parcial,
+body.dark-theme .pedido-status-badge.parcial {
+  background: rgba(245, 158, 11, 0.22) !important;
+  color: #fcd34d !important;
+}
+
+body.dark-theme .pill-copiar-pix-grupo,
+body.dark-theme .btn-pix-mini,
+body.dark-theme .pix-tag-btn {
+  background: rgba(20, 184, 166, 0.16) !important;
+  border-color: rgba(45, 212, 191, 0.35) !important;
+  color: #5eead4 !important;
+}
+
+body.dark-theme .pill-whats-grupo,
+body.dark-theme .btn-whats-mini,
+body.dark-theme .btn-whats-rank {
+  background: rgba(34, 197, 94, 0.18) !important;
+  border-color: rgba(74, 222, 128, 0.38) !important;
+  color: #86efac !important;
+}
+
+body.dark-theme .btn-mais-um-hoje {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: rgba(129, 140, 248, 0.4) !important;
+  color: #c7d2fe !important;
+}
+
+body.dark-theme .chevron-circle {
+  background: rgba(99, 102, 241, 0.18) !important;
+  color: #a5b4fc !important;
+}
+
+/* Botões de Filtro, Chips e Ações de Item */
+body.dark-theme .chip-btn:not(.ativo),
+body.dark-theme .periodo-chip:not(.ativo),
+body.dark-theme .chip-periodo:not(.ativo),
+body.dark-theme .btn-toggle-all {
+  background: #151e32 !important;
+  border-color: #2a3956 !important;
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .chip-btn.ativo:not(.chip-pendente):not(.chip-pago) {
+  background: #4f46e5 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+}
+
+body.dark-theme .btn-marcar-pago,
+body.dark-theme .btn-editar-item,
+body.dark-theme .btn-trocar-prod,
+body.dark-theme .btn-trocar-anexo,
+body.dark-theme .btn-mini-trocar {
+  background: rgba(99, 102, 241, 0.2) !important;
+  border-color: rgba(129, 140, 248, 0.35) !important;
+  color: #a5b4fc !important;
+}
+
+body.dark-theme .btn-reabrir {
+  background: #26334d !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .btn-excluir-item,
+body.dark-theme .btn-limpar-prod,
+body.dark-theme .btn-remover-anexo,
+body.dark-theme .btn-mini-remover {
+  background: rgba(239, 68, 68, 0.18) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+body.dark-theme .btn-acao {
+  background: #151e32 !important;
+  border-color: #2a3956 !important;
+}
+
+body.dark-theme .btn-editar {
+  color: #60a5fa !important;
+}
+
+body.dark-theme .btn-cancelar,
+body.dark-theme .btn-cancel,
+body.dark-theme .btn-escolher-arquivo,
+body.dark-theme .btn-copiar {
+  background: #151e32 !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+/* Botão Ler QR Code PIX em Dark Mode */
+body.dark-theme .btn-scan-qr,
+body.dark-theme .btn-qr-mini {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.25) 0%, rgba(15, 118, 110, 0.35) 100%) !important;
+  border-color: rgba(45, 212, 191, 0.45) !important;
+  color: #5eead4 !important;
+}
+
+body.dark-theme .btn-scan-qr mat-icon,
+body.dark-theme .btn-qr-mini mat-icon {
+  color: #2dd4bf !important;
+}
+
+/* Inputs, Textareas, Steppers e Toggle Groups */
+body.dark-theme input:not([type="checkbox"]),
+body.dark-theme select,
+body.dark-theme textarea {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+  border-color: #2e3f5c !important;
+}
+
+body.dark-theme input:not([type="checkbox"]):focus,
+body.dark-theme select:focus,
+body.dark-theme textarea:focus {
+  border-color: #818cf8 !important;
+  background-color: #0f172a !important;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #64748b !important;
+}
+
+body.dark-theme .tipo-toggle-group,
+body.dark-theme .modo-tabs,
+body.dark-theme .tabs-bar {
+  background: #0b1120 !important;
+  border-color: #26334d !important;
+}
+
+body.dark-theme .tipo-btn.ativo,
+body.dark-theme .modo-tab.ativo,
+body.dark-theme .tab-btn.ativo {
+  background: #1e293b !important;
+  color: #a5b4fc !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-theme .stepper-box,
+body.dark-theme .stepper-mini,
+body.dark-theme .stepper-row {
+  background: #0b1120 !important;
+  border-color: #2e3f5c !important;
+}
+
+body.dark-theme .stepper-btn,
+body.dark-theme .st-btn,
+body.dark-theme .step-btn {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Cards de Formulário: Seletor de Produto, Total Banner, Comprovantes */
+body.dark-theme .produto-selector-card,
+body.dark-theme .comprovante-upload-dropzone,
+body.dark-theme .anexo-vazio,
+body.dark-theme .anexo-dropzone {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .produto-selector-card.has-produto {
+  background: linear-gradient(135deg, #151e32 0%, #1e1b4b 100%) !important;
+  border-color: #4f46e5 !important;
+}
+
+body.dark-theme .icon-search-prod,
+body.dark-theme .empty-icon-circle,
+body.dark-theme .vazia-icone-circle,
+body.dark-theme .clear-btn,
+body.dark-theme .clear-search-btn {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .vazio-texts strong,
+body.dark-theme .dropzone-texts strong {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .resumo-total-banner,
+body.dark-theme .total-banner,
+body.dark-theme .resumo-lote-card {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.22) 0%, rgba(49, 46, 129, 0.38) 100%) !important;
+  border-color: rgba(129, 140, 248, 0.4) !important;
+}
+
+body.dark-theme .resumo-label,
+body.dark-theme .total-banner span {
+  color: #c7d2fe !important;
+}
+
+body.dark-theme .resumo-detalhe {
+  color: #a5b4fc !important;
+}
+
+body.dark-theme .resumo-valor,
+body.dark-theme .total-banner strong,
+body.dark-theme .resumo-dir strong {
+  color: #ffffff !important;
+}
+
+body.dark-theme .checkbox-grupo:not(.marcado-pago) {
+  background: #0f172a !important;
+  border-color: #2e3f5c !important;
+}
+
+body.dark-theme .checkbox-grupo.marcado-pago {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+}
+
+body.dark-theme .pedido-comprovante-box,
+body.dark-theme .comprovante-anexado-card,
+body.dark-theme .anexo-preenchido {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+body.dark-theme .comprovante-titulo,
+body.dark-theme .anexo-esq {
+  color: #6ee7b7 !important;
+}
+
+body.dark-theme .comprovante-sub {
+  color: #34d399 !important;
+}
+
+body.dark-theme .btn-ver-comprovante,
+body.dark-theme .btn-hist-anexo {
+  background: #151e32 !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  color: #34d399 !important;
+}
+
+/* Ranking & Barras de Relatórios */
+body.dark-theme .rank-bar-track {
+  background: #1e293b !important;
+}
+
+body.dark-theme .rank-pos:not(.top1):not(.top3) {
+  background: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+/* Modais (Angular Material Dialogs) */
+body.dark-theme .mat-mdc-dialog-surface.mdc-dialog__surface {
+  background: #151e32 !important;
+  color: #f8fafc !important;
+  border: 1px solid #2a3956;
+}
+
+body.dark-theme .modal-wrapper,
+body.dark-theme .pagamento-modal-wrapper,
+body.dark-theme .lote-modal-wrapper,
+body.dark-theme .whats-modal-wrapper,
+body.dark-theme .backup-modal-wrapper,
+body.dark-theme .editar-modal-wrapper,
+body.dark-theme .produto-select-modal-wrapper,
+body.dark-theme .qr-scanner-modal-wrapper,
+body.dark-theme .qr-modal-wrapper {
+  background: #151e32 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer,
+body.dark-theme .busca-container {
+  background: #151e32 !important;
+  border-color: #26334d !important;
+}
+
+body.dark-theme .modal-body {
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .close-btn {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .produto-item-card.item-selecionado,
+body.dark-theme .item-lote-row.selecionado {
+  background: rgba(79, 70, 229, 0.22) !important;
+  border-color: #6366f1 !important;
+}
+
+body.dark-theme .itens-scroll,
+body.dark-theme .item-lote-row {
+  background: #0f172a !important;
+  border-color: #26334d !important;
+}
+
+body.dark-theme .item-lote-nome {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .item-lote-valor {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .saldo-restante-card,
+body.dark-theme .total-pagar-card {
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+body.dark-theme .saldo-restante-card span,
+body.dark-theme .total-pagar-card span {
+  color: #6ee7b7 !important;
+}
+
+body.dark-theme .saldo-restante-card strong,
+body.dark-theme .total-pagar-card strong {
+  color: #34d399 !important;
+}
+
+body.dark-theme .atalho-btn {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .atalho-btn.ativo {
+  background: rgba(16, 185, 129, 0.22) !important;
+  border-color: #10b981 !important;
+  color: #6ee7b7 !important;
+}
+
+body.dark-theme .resultado-card {
+  background: rgba(20, 184, 166, 0.14) !important;
+  border-color: rgba(45, 212, 191, 0.35) !important;
+}
+
+body.dark-theme .resultado-valor-box {
+  background: #0f172a !important;
+  border-color: #2a3956 !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .opcao-radio-card {
+  background: #0f172a !important;
+  border-color: #2a3956 !important;
+}
+
+body.dark-theme .opcao-radio-card.selecionado {
+  background: rgba(20, 184, 166, 0.18) !important;
+  border-color: #14b8a6 !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-app);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-main);
+  overflow-x: hidden;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Evita zoom automático indesejado no iOS/Android em inputs menores que 16px */
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 16px;
+}
+
+/* Padronização do Container de Modal Angular Material */
+.mat-mdc-dialog-surface.mdc-dialog__surface {
+  border-radius: 16px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Scroll suave e amigável para touch */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+body.dark-theme ::-webkit-scrollbar-thumb {
+  background: #334155;
+}

@@ -1,0 +1,211 @@
+<div class="produtos-container">
+
+  <!-- Feedback Toast -->
+  <div *ngIf="feedback" class="feedback-toast" [ngClass]="feedback.tipo">
+    <mat-icon>{{ feedback.tipo === 'sucesso' ? 'check_circle' : 'error' }}</mat-icon>
+    <span>{{ feedback.texto }}</span>
+  </div>
+
+  <!-- Bloco de Cadastro / Edição Rápida -->
+  <section class="card-formulario">
+    <div class="card-header">
+      <div class="header-icon-badge" [class.edit-mode]="modoEdicao">
+        <mat-icon>{{ modoEdicao ? 'edit_note' : 'add_business' }}</mat-icon>
+      </div>
+      <div>
+        <h3>{{ modoEdicao ? 'Editar Produto' : 'Novo Produto no Catálogo' }}</h3>
+        <p>Vincule o produto à pessoa/vendedor e defina o preço</p>
+      </div>
+    </div>
+
+    <form (ngSubmit)="salvarProduto()" class="form-produto">
+
+      <div class="campo-grupo">
+        <label for="nomeProd">
+          <mat-icon>cake</mat-icon>
+          <span>Nome do Doce / Produto *</span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            id="nomeProd"
+            type="text"
+            placeholder="Ex: Cone Trufado, Trufa, Bolo de Pote"
+            [(ngModel)]="novoNome"
+            name="novoNome"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="linha-dupla-prod">
+        <div class="campo-grupo">
+          <label for="vendedorProd">
+            <mat-icon>person</mat-icon>
+            <span>Pessoa / Vendedor *</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="vendedorProd"
+              type="text"
+              placeholder="Ex: Patrícia, Seu Zé"
+              [(ngModel)]="novoVendedor"
+              (blur)="onVendedorInput()"
+              name="novoVendedor"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="precoProd">
+            <mat-icon>payments</mat-icon>
+            <span>Preço Unitário (R$) *</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="precoProd"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0,00"
+              [(ngModel)]="novoPreco"
+              name="novoPreco"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="campo-grupo">
+        <label for="pixProd">
+          <mat-icon>qr_code_2</mat-icon>
+          <span>Chave PIX da Pessoa / Vendedor (Opcional)</span>
+        </label>
+        <div class="input-pix-row">
+          <div class="input-wrapper pix-input-flex">
+            <input
+              id="pixProd"
+              type="text"
+              placeholder="CPF, Celular, E-mail ou Chave Aleatória"
+              [(ngModel)]="novaChavePix"
+              name="novaChavePix"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn-scan-qr"
+            matRipple
+            title="Ler QR Code PIX pela câmera ou imagem"
+            (click)="abrirScannerQrPix()">
+            <mat-icon>qr_code_scanner</mat-icon>
+            <span>Ler QR</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="botoes-form">
+        <button
+          *ngIf="modoEdicao"
+          type="button"
+          class="btn-cancelar"
+          matRipple
+          (click)="cancelarEdicao()">
+          <mat-icon>close</mat-icon>
+          <span>Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          class="btn-salvar"
+          matRipple
+          [disabled]="salvando">
+          <mat-icon>{{ modoEdicao ? 'save' : 'add_circle' }}</mat-icon>
+          <span>{{ modoEdicao ? 'Salvar Alteração' : 'Cadastrar Produto' }}</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Lista de Produtos Cadastrados -->
+  <section class="card-lista">
+    <div class="lista-header">
+      <div class="lista-titulo-box">
+        <mat-icon>inventory_2</mat-icon>
+        <h4>Catálogo Cadastrado ({{ produtosFiltrados.length }})</h4>
+      </div>
+      <div class="busca-catalogo" *ngIf="produtos.length > 0">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Filtrar produto ou pessoa..."
+          [(ngModel)]="buscaCatalogo"
+        />
+        <button *ngIf="buscaCatalogo" type="button" class="clear-search" (click)="buscaCatalogo = ''">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="carregando" class="carregando-box">
+      <div class="spinner"></div>
+      <p>Carregando catálogo...</p>
+    </div>
+
+    <div *ngIf="!carregando && produtosFiltrados.length === 0" class="sem-itens">
+      <div class="empty-icon-circle">
+        <mat-icon>storefront</mat-icon>
+      </div>
+      <h5>Nenhum produto encontrado</h5>
+      <p>Cadastre os produtos acima vinculando a pessoa que vende para agilizar seus lançamentos.</p>
+    </div>
+
+    <div *ngIf="!carregando && produtosFiltrados.length > 0" class="itens-grid">
+      <div *ngFor="let item of produtosFiltrados" class="item-card">
+        <div class="item-avatar">
+          <mat-icon>lunch_dining</mat-icon>
+        </div>
+
+        <div class="item-dados">
+          <span class="item-nome">{{ item.nome }}</span>
+          <div class="item-meta">
+            <span class="vendedor-tag">
+              <mat-icon>person</mat-icon>
+              {{ item.vendedor_pessoa || 'Sem pessoa vinculada' }}
+            </span>
+            <button
+              *ngIf="item.chave_pix"
+              type="button"
+              class="pix-tag-btn"
+              matRipple
+              title="Toque para copiar a chave PIX"
+              (click)="copiarPix(item.chave_pix, $event)">
+              <mat-icon>content_copy</mat-icon>
+              <span>PIX: {{ item.chave_pix }}</span>
+            </button>
+            <span class="item-preco">R$ {{ item.preco_padrao.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="item-acoes">
+          <button
+            type="button"
+            class="btn-acao btn-editar"
+            matRipple
+            title="Editar produto"
+            (click)="iniciarEdicao(item)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            type="button"
+            class="btn-acao btn-excluir"
+            matRipple
+            title="Excluir produto"
+            (click)="excluir(item)">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
