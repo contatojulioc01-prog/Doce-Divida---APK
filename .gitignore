@@ -8,41 +8,56 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .npm/
+.pnp.*
+.yarn/*
 
 # ============================================================================
-# Build e Cache do Angular (Frontend)
+# Build, Bundles e Cache do Angular / Capacitor (Frontend)
 # ============================================================================
 dist/
 **/dist/
 tmp/
+**/tmp/
 out-tsc/
+**/out-tsc/
 .angular/
 **/.angular/
 .cache/
 .parcel-cache/
 coverage/
+**/coverage/
+capacitor.config.ts.timestamp-*
 
 # ============================================================================
 # Banco de Dados Local SQLite (Desenvolvimento / Backend)
 # ============================================================================
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
 *.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.sqlite3-journal
 *.db
-*.db-journal
 *.db-shm
 *.db-wal
+*.db-journal
 
 # ============================================================================
-# Android, Gradle e Capacitor
+# Android, Gradle e Capacitor Nativo
 # ============================================================================
 .gradle/
 **/.gradle/
+.kotlin/
+**/.kotlin/
 frontend/android/build/
 frontend/android/app/build/
 frontend/android/local.properties
 frontend/android/.idea/
 frontend/android/*.iml
 frontend/android/captures/
+frontend/android/.navigation/
 frontend/android/.externalNativeBuild/
 frontend/android/.cxx/
 frontend/android/capacitor-cordova-android-plugins/
@@ -50,6 +65,8 @@ frontend/android/app/src/main/assets/public/
 frontend/android/app/src/main/assets/capacitor.config.json
 frontend/android/app/src/main/assets/capacitor.plugins.json
 frontend/android/app/src/main/res/xml/config.xml
+output-metadata.json
+*.hprof
 
 # Binários compilados e Chaves Privadas de Assinatura (Segurança)
 apk/*.apk
@@ -57,19 +74,24 @@ apk/*.aab
 *.apk
 *.aab
 *.ap_
+*.aar
 *.dex
+*.class
 *.jks
 *.keystore
+*.pepk
+key.properties
+keystore.properties
 
 # ============================================================================
 # Variáveis de Ambiente e Segredos
 # ============================================================================
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 *.pem
+*.key
+*.crt
 
 # ============================================================================
 # Editores / IDEs e Sistema Operacional
@@ -78,6 +100,8 @@ apk/*.aab
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+**/.idea/
+*.iml
 *.swp
 *.swo
 *~
@@ -85,4 +109,3 @@ apk/*.aab
 Thumbs.db
 Desktop.ini
 *.log
-
